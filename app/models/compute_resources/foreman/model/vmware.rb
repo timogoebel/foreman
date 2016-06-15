@@ -109,6 +109,12 @@ module Foreman::Model
       name_sort(cluster.resource_pools.all(:accessible => true))
     end
 
+    def hosts(opts = {})
+      return [] unless opts[:cluster_id]
+      cluster = cluster(opts[:cluster_id])
+      name_sort(cluster.hosts.all)
+    end
+
     def available_clusters
       name_sort(dc.clusters)
     end
@@ -375,6 +381,7 @@ module Foreman::Model
       if args[:provision_method] == 'image'
         clone_vm(args)
       else
+        args[:host] = args.delete(:hypervisor) if args[:hypervisor].present?
         vm = new_vm(args)
         vm.save
       end
@@ -427,6 +434,7 @@ module Foreman::Model
       opts['interfaces'] = vm_model.interfaces
       opts['volumes'] = vm_model.volumes
       opts["customization_spec"] = client.cloudinit_to_customspec(args[:user_data]) if args[:user_data]
+      opts["host"] = args[:host] if args.has_key?(:host)
       client.servers.get(client.vm_clone(opts)['new_vm']['id'])
     end
 
