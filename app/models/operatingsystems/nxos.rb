@@ -11,14 +11,8 @@ class NXOS < Operatingsystem
     Operatingsystem
   end
 
-  # The variant to use when communicating with the proxy. We also need a new type here.
-  def pxe_variant
-    "poap"
-  end
-
-  # The kind of PXE configuration template used. POAP is used for Cisco POAP scripts.
-  def template_kind
-    "POAP"
+  def template_kinds
+    ["POAP"]
   end
 
   def pxedir
@@ -29,7 +23,11 @@ class NXOS < Operatingsystem
     raise ::Foreman::Exception.new(N_("Function not available for %s"), self.display_family)
   end
 
-  # where to create the boot file on the TFTP server
+  def available_loaders
+    # ignored for this OS
+    []
+  end
+
   def boot_filename(host = nil)
     "poap.cfg/"+host.mac.gsub(/:/,"").upcase
   end

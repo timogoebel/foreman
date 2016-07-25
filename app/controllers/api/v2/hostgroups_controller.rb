@@ -34,6 +34,7 @@ module Api
           param :compute_profile_id, :number, :desc => N_('Compute profile ID')
           param :operatingsystem_id, :number, :desc => N_('Operating system ID')
           param :architecture_id, :number, :desc => N_('Architecture ID')
+          param :pxe_loader, Operatingsystem.all_loaders, :desc => N_("DHCP filename option (Grub2/PXELinux by default)"), :required => true
           param :medium_id, :number, :desc => N_('Media ID')
           param :ptable_id, :number, :desc => N_('Partition table ID')
           param :puppet_ca_proxy_id, :number, :desc => N_('Puppet CA proxy ID')
@@ -51,6 +52,7 @@ module Api
 
       def create
         @hostgroup = Hostgroup.new(hostgroup_params)
+        @hostgroup.pxe_loader = @hostgroup.operatingsystem.try(:preferred_loader) if @hostgroup.pxe_loader.blank?
         process_response @hostgroup.save
       end
 
@@ -59,6 +61,7 @@ module Api
       param_group :hostgroup
 
       def update
+        @hostgroup.pxe_loader = @hostgroup.operatingsystem.try(:preferred_loader) if @hostgroup.pxe_loader.blank?
         process_response @hostgroup.update_attributes(hostgroup_params)
       end
 

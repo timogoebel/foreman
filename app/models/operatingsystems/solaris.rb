@@ -23,14 +23,8 @@ class Solaris < Operatingsystem
     "jumpstart"
   end
 
-  # The variant to use when communicating with the proxy. Syslinux are pxegrub currently supported
-  def pxe_variant
-    "pxegrub"
-  end
-
-  # The kind of PXE configuration template used. PXELinux and PXEGrub are currently supported
-  def template_kind
-    "PXEGrub"
+  def template_kinds
+    ["PXEGrub"]
   end
 
   def pxedir
@@ -41,8 +35,12 @@ class Solaris < Operatingsystem
     pxedir + "/" + PXEFILES[file]
   end
 
+  def available_loaders
+    # ignored for this OS
+    []
+  end
+
   def boot_filename(host)
-    #handle things like gpxelinux/ gpxe / pxelinux here
     if host.jumpstart?
       "Solaris-#{major}.#{minor}-#{release_name}-#{host.model.hardware_model}-inetboot"
     else

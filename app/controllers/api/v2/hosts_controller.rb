@@ -56,6 +56,7 @@ module Api
           param :puppetclass_ids, Array
           param :operatingsystem_id, String, :desc => N_("required if host is managed and value is not inherited from host group")
           param :medium_id, String, :desc => N_("required if not imaged based provisioning and host is managed and value is not inherited from host group")
+          param :pxe_loader, Operatingsystem.all_loaders, :desc => N_("DHCP filename option (Grub2/PXELinux by default)"), :required => true
           param :ptable_id, :number, :desc => N_("required if host is managed and custom partition has not been defined")
           param :subnet_id, :number, :desc => N_("required if host is managed and value is not inherited from host group")
           param :compute_resource_id, :number, :desc => N_("nil means host is bare metal")
@@ -98,6 +99,7 @@ module Api
       def create
         @host = Host.new(host_attributes(host_params))
         @host.managed = true if (params[:host] && params[:host][:managed].nil?)
+        @host.pxe_loader = @host.operatingsystem.try(:preferred_loader) if @host.pxe_loader.blank?
         apply_compute_profile(@host)
 
         forward_request_url
@@ -112,6 +114,7 @@ module Api
 
       def update
         @host.attributes = host_attributes(host_params, @host)
+        @host.pxe_loader = @host.operatingsystem.try(:preferred_loader) if @host.pxe_loader.blank?
         apply_compute_profile(@host)
 
         process_response @host.save

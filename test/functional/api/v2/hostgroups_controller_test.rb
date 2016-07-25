@@ -1,6 +1,13 @@
 require 'test_helper'
 
 class Api::V2::HostgroupsControllerTest < ActionController::TestCase
+  def os_attrs
+    {
+      :architecture_id     => Architecture.find_by_name('x86_64').id,
+      :operatingsystem_id  => Operatingsystem.find_by_name('Redhat').id
+    }
+  end
+
   valid_attrs = { :name => 'TestHostgroup' }
 
   test "should get index" do
@@ -18,10 +25,40 @@ class Api::V2::HostgroupsControllerTest < ActionController::TestCase
     assert !show_response.empty?
   end
 
+  def last_hostgroup
+    Hostgroup.unscoped.order(:id).last
+  end
+
   test "should create hostgroup" do
     assert_difference('Hostgroup.count') do
       post :create, { :hostgroup => valid_attrs }
     end
+    assert_response :created
+  end
+
+  test "should create hostgroup with default pxe loader" do
+    Operatingsystem.any_instance.expects(:preferred_loader).returns("PXELinux BIOS")
+    assert_difference('Hostgroup.count') do
+      post :create, { :hostgroup => valid_attrs.merge(os_attrs) }
+    end
+    assert_equal "PXELinux BIOS", last_hostgroup.pxe_loader
+    refute_nil last_hostgroup.operatingsystem
+    assert_response :created
+  end
+
+  test "should create hostgroup with some pxe loader" do
+    assert_difference('Hostgroup.count') do
+      post :create, { :hostgroup => valid_attrs.merge(:pxe_loader => "Grub2 UEFI SecureBoot") }
+    end
+    assert_equal "Grub2 UEFI SecureBoot", last_hostgroup.pxe_loader
+    assert_response :created
+  end
+
+  test "should create hostgroup with non-PXE pxe loader" do
+    assert_difference('Hostgroup.count') do
+      post :create, { :hostgroup => valid_attrs.merge(:pxe_loader => "") }
+    end
+    assert_equal "", last_hostgroup.pxe_loader
     assert_response :created
   end
 
@@ -57,7 +94,7 @@ class Api::V2::HostgroupsControllerTest < ActionController::TestCase
       post :create, { :hostgroup => valid_attrs.merge(:parent_id => hostgroups(:common).id) }
     end
     assert_response :success
-    assert_equal hostgroups(:common).id.to_s, Hostgroup.unscoped.order(:id).last.ancestry
+    assert_equal hostgroups(:common).id.to_s, last_hostgroup.ancestry
   end
 
   test "should update a hostgroup to nested by passing parent_id" do

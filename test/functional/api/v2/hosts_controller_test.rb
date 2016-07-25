@@ -58,7 +58,7 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
   end
 
   def last_host
-    Host.order('id asc').last
+    Host.unscoped.order(:id).last
   end
 
   def expect_attribute_modifier(modifier_class, args)
@@ -97,6 +97,34 @@ class Api::V2::HostsControllerTest < ActionController::TestCase
     assert_difference('Host.count') do
       post :create, { :host => valid_attrs }
     end
+    assert_response :created
+  end
+
+  test "should create host with default pxe_loader" do
+    disable_orchestration
+    Operatingsystem.any_instance.expects(:preferred_loader).returns("Grub UEFI")
+    assert_difference('Host.count') do
+      post :create, { :host => valid_attrs }
+    end
+    assert_equal "Grub UEFI", last_host.pxe_loader
+    assert_response :created
+  end
+
+  test "should create host with some pxe_loader" do
+    disable_orchestration
+    assert_difference('Host.count') do
+      post :create, { :host => valid_attrs.merge(:pxe_loader => "Grub2 UEFI SecureBoot") }
+    end
+    assert_equal "Grub2 UEFI SecureBoot", last_host.pxe_loader
+    assert_response :created
+  end
+
+  test "should create host with non-PXE pxe_loader" do
+    disable_orchestration
+    assert_difference('Host.count') do
+      post :create, { :host => valid_attrs.merge(:pxe_loader => "") }
+    end
+    assert_equal "", last_host.pxe_loader
     assert_response :created
   end
 

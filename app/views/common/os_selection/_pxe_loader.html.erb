@@ -1,0 +1,12 @@
+<%= fields_for item do |f| -%>
+  <% loaders = @operatingsystem.available_loaders; if loaders.any? -%>
+    <% selected_attr = item.new_record? && item.pxe_loader == "" ? { :selected => @operatingsystem.preferred_loader } : {} -%>
+    <%= selectable_f f, :pxe_loader,
+      loaders.to_a, {
+        :include_blank => blank_or_inherit_f(f, :pxe_loader),
+        :selected => item.pxe_loader
+      }.merge(selected_attr),
+      :label => _('PXE Loader'),
+      :help_inline => popover(_("DHCP filename option"), _("DHCP filename option to use. Set to None for non-PXE method (e.g. iPXE)"), :data => { :placement => 'top' }) %>
+  <% end -%>
+<% end -%>

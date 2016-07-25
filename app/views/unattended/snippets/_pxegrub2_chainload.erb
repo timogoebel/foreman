@@ -1,0 +1,10 @@
+<%#
+kind: snippet
+name: pxegrub2_chainload
+%>
+menuentry "Chainload into bootloader on first disk" {
+  insmod part_msdos
+  insmod chain
+  chainloader (hd0,0)+1
+}
+<%# vim:sw=2:ts=2:et -%>

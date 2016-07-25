@@ -236,6 +236,24 @@ class OperatingsystemTest < ActiveSupport::TestCase
     refute_valid operatingsystem
   end
 
+  test "should not have preferred pxe loader for an OS without architecture associated" do
+    assert_nil Operatingsystem.new.preferred_loader
+  end
+
+  test "should have preferred pxe loader for an Solaris OS without any templates" do
+    assert_nil Solaris.new.preferred_loader
+  end
+
+  test "should have preferred pxe loader for OS with PXELinux template" do
+    os = FactoryGirl.create(:operatingsystem, :with_associations, :with_pxelinux)
+    assert_equal "PXELinux BIOS", os.preferred_loader
+  end
+
+  test "should have preferred pxe loader for OS with Grub template" do
+    os = FactoryGirl.create(:operatingsystem, :with_associations, :with_grub)
+    assert_equal "Grub UEFI", os.preferred_loader
+  end
+
   context 'os default templates' do
     setup do
       @template_kind = FactoryGirl.create(:template_kind)

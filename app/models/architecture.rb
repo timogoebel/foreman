@@ -15,4 +15,15 @@ class Architecture < ActiveRecord::Base
   audited
 
   scoped_search :on => :name, :complete_value => :true
+
+  def intel_precision
+    case name
+    when /i.86/
+      '32'
+    when /x86[_-]64/
+      '64'
+    else
+      ''
+    end
+  end
 end
