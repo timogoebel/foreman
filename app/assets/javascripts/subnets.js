@@ -39,7 +39,6 @@ function updateSupportedIPAM(element) {
 $(document).on('click', "input[id^=subnet_type_]", function () {
   var element = $(this);
   updateSupportedIPAM(element);
-  toggleSubnetField(element, 'supports_dhcp', '#subnet_dhcp_id')
   toggleSubnetField(element, 'show_mask', '#subnet_mask');
   subnetMaskChanged($('#subnet_mask'));
   subnetCidrChanged($('#subnet_cidr'));

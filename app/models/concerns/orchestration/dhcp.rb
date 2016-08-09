@@ -9,82 +9,39 @@ module Orchestration::DHCP
     register_rebuild(:rebuild_dhcp, N_('DHCP'))
   end
 
-  def dhcp?
+  def dhcp_ready?
     # host.managed? and managed? should always come first so that orchestration doesn't
     # even get tested for such objects
     #
     # The subnet boot mode is ignored as DHCP can be required for PXE or image provisioning
     # steps, while boot mode can be used in templates later.
-    (host.nil? || host.managed?) && managed? && hostname.present? && ip_available? && mac_available? &&
-        !subnet.nil? && subnet.dhcp? && SETTINGS[:unattended] && (!provision? || operatingsystem.present?)
+    (host.nil? || host.managed?) && managed? && hostname.present? && mac_available? &&
+      SETTINGS[:unattended] && (!provision? || operatingsystem.present?)
   end
 
-  def dhcp_record
-    return unless dhcp? || @dhcp_record
-    handle_validation_errors do
-      @dhcp_record ||= (provision? && jumpstart?) ? Net::DHCP::SparcRecord.new(dhcp_attrs) : Net::DHCP::Record.new(dhcp_attrs)
-    end
+  def dhcp?
+    dhcp_ready? && ip_available? && subnet.present? && subnet.dhcp?
+  end
+
+  def dhcp6?
+    dhcp_ready? && ip6_available? && subnet6.present? && subnet6.dhcp?
   end
 
   def rebuild_dhcp
-    if dhcp?
-      del_dhcp_safe
-      begin
-        set_dhcp
-      rescue => e
-        Foreman::Logging.exception "Failed to rebuild DHCP record for #{name}, #{ip}", e, :level => :error
-        false
-      end
-    else
-      logger.info "DHCP not supported for #{name}, #{ip}, skipping orchestration rebuild"
-      true
+    unless any_dhcp?
+      logger.info "DHCP not supported for #{name} (#{ip}/#{ip6}) skipping orchestration rebuild"
+      return true
     end
-  end
 
-  protected
+    results = {}
 
-  def del_dhcp_safe
-    if dhcp_record
-      begin
-        del_dhcp
-      rescue => e
-        Foreman::Logging.exception "Proxy failed to delete DHCP record for #{name}, #{ip}", e, :level => :error
-      end
+    DhcpInterface::DHCP_RECORD_TYPES.each do |record_type|
+      next unless dhcp_feasible?(record_type)
+      del_dhcp_record_safe(record_type)
+      results[record_type] = recreate_dhcp_record_safe(record_type)
     end
-  end
 
-  def set_dhcp
-    dhcp_record.create
-  end
-
-  def set_dhcp_conflicts
-    dhcp_record.conflicts.each{|conflict| conflict.create}
-  end
-
-  def del_dhcp
-    dhcp_record.destroy
-  end
-
-  def del_dhcp_conflicts
-    dhcp_record.conflicts.each{|conflict| conflict.destroy}
-  end
-
-  # where are we booting from
-  def boot_server
-    # if we don't manage tftp at all, we dont create a next-server entry.
-    return unless tftp?
-
-    # first try to ask our TFTP server for its boot server
-    bs = tftp.bootServer
-    # if that failed, trying to guess out tftp next server based on the smart proxy hostname
-    bs ||= URI.parse(subnet.tftp.url).host
-    # now convert it into an ip address (see http://theforeman.org/issues/show/1381)
-    ip = to_ip_address(bs) if bs.present?
-    return ip unless ip.nil?
-
-    failure _("Unable to determine the host's boot server. The DHCP smart proxy failed to provide this information and this subnet is not provided with TFTP services.")
-  rescue => e
-    failure _("failed to detect boot server: %s") % e, e
+    results.values.all?
   end
 
   private
@@ -113,32 +70,70 @@ module Orchestration::DHCP
   end
 
   def queue_dhcp
-    return unless (dhcp? || (old && old.dhcp?)) && orchestration_errors?
+    return unless can_queue_dhcp?
     queue_remove_dhcp_conflicts
     new_record? ? queue_dhcp_create : queue_dhcp_update
   end
 
   def queue_dhcp_create
     logger.debug "Scheduling new DHCP reservations for #{self}"
-    queue.create(:name   => _("Create DHCP Settings for %s") % self, :priority => 10,
-                 :action => [self, :set_dhcp]) if dhcp?
-  end
-
-  def queue_dhcp_update
-    if dhcp_update_required?
-      logger.debug("Detected a changed required for DHCP record")
-      queue.create(:name => _("Remove DHCP Settings for %s") % old, :priority => 5,
-                   :action => [old, :del_dhcp]) if old.dhcp?
-      queue.create(:name   => _("Create DHCP Settings for %s") % self, :priority => 9,
-                   :action => [self, :set_dhcp]) if dhcp?
+    DhcpInterface::DHCP_RECORD_TYPES.each do |record_type|
+      queue.create(:name   => _("Create %{type} Settings for %{host}") % {:host => self, :type => dhcp_class(record_type).human}, :priority => 10,
+                   :action => [self, :set_dhcp_record, record_type]) if dhcp_feasible?(record_type)
     end
   end
 
+  def queue_dhcp_update
+    return unless dhcp_update_required?
+    logger.debug("Detected a changed required for DHCP record")
+
+    DhcpInterface::DHCP_RECORD_TYPES.each do |record_type|
+      queue.create(:name   => _("Remove %{type} Settings for %{host}") % {:host => self, :type => dhcp_class(record_type).human}, :priority => 5,
+                   :action => [old, :del_dhcp_record, record_type]) if old.dhcp_feasible?(record_type)
+      queue.create(:name   => _("Create %{type} Settings for %{host}") % {:host => self, :type => dhcp_class(record_type).human}, :priority => 9,
+                   :action => [self, :set_dhcp_record, record_type]) if dhcp_feasible?(record_type)
+    end
+  end
+
+  def queue_dhcp_destroy
+    return unless (any_dhcp?) && errors.empty?
+    DhcpInterface::DHCP_RECORD_TYPES.each do |record_type|
+      queue.create(:name   => _("Remove %{type} Settings for %{host}") % {:host => self, :type => dhcp_class(record_type).human}, :priority => 5,
+                   :action => [self, :del_dhcp_record, record_type]) if dhcp_feasible?(record_type)
+    end
+    true
+  end
+
+  def queue_remove_dhcp_conflicts
+    return if !(dhcp? || dhcp6?) || !overwrite?
+
+    logger.debug "Scheduling DHCP conflicts removal"
+    DhcpInterface::DHCP_RECORD_TYPES.each do |record_type|
+      queue.create(:name   => _("%{type} conflicts removal for %{host}") % {:host => self, :type => dhcp_class(record_type).human}, :priority => 5,
+                   :action => [self, :del_conflicting_dhcp_record, record_type]) if dhcp_feasible?(record_type)
+    end
+  end
+
+  def dhcp_conflict_detected?
+    # we can't do any dhcp based validations when our MAC address is defined afterwards (e.g. in vm creation)
+    return false if mac.blank? || hostname.blank?
+    return false unless any_dhcp?
+
+    DhcpInterface::DHCP_RECORD_TYPES.each do |record_type|
+      if dhcp_record(record_type) && dhcp_record(record_type).conflicting? && (!overwrite?)
+        failure(_("%{type} records %{records} already exists") % { :records => dhcp_record(record_type).conflicts.to_sentence, :type => dhcp_class(record_type).human}, nil, :conflict)
+        return true
+      end
+    end
+    false
+  end
+
+  # TODO: Fixme v6
   # do we need to update our dhcp reservations
   def dhcp_update_required?
     # IP Address / name changed, or 'rebuild' action is triggered and DHCP record on the smart proxy is not present/identical.
     return true if ((old.ip != ip) || (old.hostname != hostname) || (old.mac != mac) || (old.subnet != subnet) ||
-                    (!old.build? && build? && !dhcp_record.valid?))
+                    (!old.build? && build? && !dhcp_record(:dhcp).valid?))
     # Handle jumpstart
     #TODO, abstract this way once interfaces are fully used
     if self.is_a?(Host::Base) && jumpstart?
@@ -150,30 +145,11 @@ module Orchestration::DHCP
     false
   end
 
-  def queue_dhcp_destroy
-    return unless dhcp? && errors.empty?
-    queue.create(:name   => _("Remove DHCP Settings for %s") % self, :priority => 5,
-                 :action => [self, :del_dhcp])
-    true
+  def can_queue_dhcp?
+    (dhcp? || (old && old.dhcp?) || dhcp6? || (old && old.dhcp6?)) && orchestration_errors?
   end
 
-  def queue_remove_dhcp_conflicts
-    return if !dhcp? || !overwrite?
-
-    logger.debug "Scheduling DHCP conflicts removal"
-    queue.create(:name   => _("DHCP conflicts removal for %s") % self, :priority => 5,
-                 :action => [self, :del_dhcp_conflicts])
-  end
-
-  def dhcp_conflict_detected?
-    # we can't do any dhcp based validations when our MAC address is defined afterwards (e.g. in vm creation)
-    return false if mac.blank? || hostname.blank?
-    return false unless dhcp?
-
-    if dhcp_record && dhcp_record.conflicting? && (!overwrite?)
-      failure(_("DHCP records %s already exists") % dhcp_record.conflicts.to_sentence, nil, :conflict)
-      return true
-    end
-    false
+  def any_dhcp?
+    dhcp? || dhcp6?
   end
 end

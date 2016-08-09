@@ -26,8 +26,7 @@
     </div>
     <div class="tab-pane" id="proxies">
       <%= select_f f, :dhcp_id, SmartProxy.with_features("DHCP"), :id, :name,
-        {:include_blank => _("None")}, :label => _("DHCP Proxy"), :help_inline => _("DHCP Proxy to use within this subnet"),
-         :wrapper_class => "form-group #{'hide' unless f.object.supports_ipam_mode?(:dhcp)}" %>
+        {:include_blank => _("None")}, :label => _("DHCP Proxy"), :help_inline => _("DHCP Proxy to use within this subnet") %>
       <%= select_f f, :tftp_id, SmartProxy.with_features("TFTP"), :id, :name,
         {:include_blank => _("None")}, :label => _("TFTP Proxy"), :help_inline => _("TFTP Proxy to use within this subnet") %>
       <%= select_f f, :dns_id, SmartProxy.with_features("DNS"), :id, :name,

@@ -294,6 +294,44 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_dhcpv6_orchestration do
+      managed
+      association :compute_resource, :factory => :libvirt_cr
+      domain
+      subnet6 do
+        overrides = {
+          :dhcp => FactoryGirl.create(:dhcp_smart_proxy)
+        }
+        #add taxonomy overrides in case it's set in the host object
+        overrides[:locations] = [location] unless location.nil?
+        overrides[:organizations] = [organization] unless organization.nil?
+        FactoryGirl.create(
+          :subnet_ipv6,
+          overrides
+        )
+      end
+      interfaces do
+        [FactoryGirl.build(:nic_managed, :without_ipv4,
+                           :primary => true,
+                           :provision => true,
+                           :domain => FactoryGirl.build(:domain),
+                           :ip6 => IPAddr.new(subnet6.ipaddr.to_i + 1, subnet6.family).to_s)]
+      end
+    end
+
+    trait :with_dual_stack_dhcp_orchestration do
+      with_dhcp_orchestration
+      with_dhcpv6_orchestration
+      interfaces do
+        [FactoryGirl.build(:nic_managed,
+                           :primary => true,
+                           :provision => true,
+                           :domain => FactoryGirl.build(:domain),
+                           :ip => subnet.network.sub(/0\Z/, '1'),
+                           :ip6 => IPAddr.new(subnet6.ipaddr.to_i + 1, subnet6.family).to_s)]
+      end
+    end
+
     trait :with_dns_orchestration do
       managed
       association :compute_resource, :factory => :libvirt_cr

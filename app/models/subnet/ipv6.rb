@@ -23,7 +23,7 @@ class Subnet::Ipv6 < Subnet
   end
 
   def self.supported_ipam_modes
-    [:eui64, :db, :none]
+    [:eui64, :db, :dhcp, :none]
   end
 
   def self.show_mask?
