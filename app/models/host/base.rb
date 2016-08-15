@@ -50,6 +50,8 @@ module Host
     scope :no_location,     -> { rewhere(:location_id => nil) }
     scope :no_organization, -> { rewhere(:organization_id => nil) }
 
+    after_initialize :suggest_default_pxe_loader
+
     # primary interface is mandatory because of delegated methods so we build it if it's missing
     # similar for provision interface
     # we can't set name attribute until we have primary interface so we don't pass it to super
@@ -475,6 +477,10 @@ module Host
       else
         true
       end
+    end
+
+    def suggest_default_pxe_loader
+      self.pxe_loader = self.operatingsystem.try(:preferred_loader) unless self.pxe_loader.present?
     end
   end
 end

@@ -52,7 +52,6 @@ module Api
 
       def create
         @hostgroup = Hostgroup.new(hostgroup_params)
-        @hostgroup.pxe_loader = @hostgroup.operatingsystem.try(:preferred_loader) if @hostgroup.pxe_loader.blank?
         process_response @hostgroup.save
       end
 
@@ -61,7 +60,6 @@ module Api
       param_group :hostgroup
 
       def update
-        @hostgroup.pxe_loader = @hostgroup.operatingsystem.try(:preferred_loader) if @hostgroup.pxe_loader.blank?
         process_response @hostgroup.update_attributes(hostgroup_params)
       end
 

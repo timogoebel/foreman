@@ -99,7 +99,6 @@ module Api
       def create
         @host = Host.new(host_attributes(host_params))
         @host.managed = true if (params[:host] && params[:host][:managed].nil?)
-        @host.pxe_loader = @host.operatingsystem.try(:preferred_loader) if @host.pxe_loader.blank?
         apply_compute_profile(@host)
 
         forward_request_url
@@ -114,7 +113,6 @@ module Api
 
       def update
         @host.attributes = host_attributes(host_params, @host)
-        @host.pxe_loader = @host.operatingsystem.try(:preferred_loader) if @host.pxe_loader.blank?
         apply_compute_profile(@host)
 
         process_response @host.save
