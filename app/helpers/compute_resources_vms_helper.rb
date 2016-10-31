@@ -191,4 +191,10 @@ module ComputeResourcesVmsHelper
   def vm_delete_action(vm, authorizer = nil)
     display_delete_if_authorized(hash_for_compute_resource_vm_path(:compute_resource_id => @compute_resource, :id => vm.identity).merge(:auth_object => @compute_resource, :authorizer => authorizer), :class => 'btn btn-danger')
   end
+
+  def vsphere_scsi_controllers(compute)
+    scsi_controllers = {}
+    compute.scsi_controller_types.map { |type| scsi_controllers[type[:key]] = type[:title] }
+    scsi_controllers
+  end
 end
