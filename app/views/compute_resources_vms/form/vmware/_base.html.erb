@@ -36,3 +36,15 @@
 </div>
 
 <%= compute_specific_js(compute_resource, "nic_info") %>
+
+<%= field_set_tag _("SCSI controllers"), :id => "scsi_controllers" do %>
+  <% f.object.scsi_controllers.each do |scsi_controller| %>
+    <%= f.fields_for 'scsi_controllers[]', scsi_controller do |i| %>
+      <%= render :partial => provider_partial(compute_resource, 'scsi_controller'), :locals => { :f => i, :compute_resource => compute_resource, :new_host => new_host, :remove_title => _('remove scsi controller'), :vm => f.object }, :layout => "compute_resources_vms/form/removable_layout" %>
+    <% end %>
+  <% end %>
+
+  <% if new_host %>
+    <%= add_child_link '+ ' + _("Add Controller"), :scsi_controllers, { :class => "info", :title => _('add new scsi controller') } %>
+  <% end %>
+<% end %>

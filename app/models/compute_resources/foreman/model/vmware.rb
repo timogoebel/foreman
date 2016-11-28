@@ -133,12 +133,12 @@ module Foreman::Model
     end
 
     def scsi_controller_types
-      [
-        {:title => "Bus Logic Parallel", :key => 1001, :type => "VirtualBusLogicController"},
-        {:title => "LSI Logic Parallel", :key => 1000, :type => "VirtualLsiLogicController"},
-        {:title => "LSI Logic SAS",      :key => 1002, :type => "VirtualLsiLogicSASController"},
-        {:title => "VMware Paravirtual", :key => 1003, :type => "ParaVirtualSCSIController"}
-      ]
+      {
+        "VirtualBusLogicController" => "Bus Logic Parallel",
+        "VirtualLsiLogicController" => "LSI Logic Parallel",
+        "VirtualLsiLogicSASController" => "LSI Logic SAS",
+        "ParaVirtualSCSIController" => "VMware Paravirtual"
+      }
     end
 
     # vSphere guest OS type descriptions
@@ -323,7 +323,12 @@ module Foreman::Model
         args[collection] = nested_attributes_for(collection, nested_attrs) if nested_attrs
       end
 
-      args[:scsi_controllers] = scsi_controller_types.each {|type| type.delete(:title) }
+      # Backwards compatibility for e.g. API requests.
+      # User can set the scsi_controller_type attribute
+      # to define a single scsi controller by that type
+      if args[:scsi_controller_type].present?
+        args[:scsi_controller] = {:type => args.delete(:scsi_controller_type)}
+      end
 
       add_cdrom = args.delete(:add_cdrom)
       args[:cdroms] = [new_cdrom] if add_cdrom == '1'
@@ -499,7 +504,7 @@ module Foreman::Model
         :memory_mb  => 768,
         :interfaces => [new_interface],
         :volumes    => [new_volume],
-        :scsi_controller => { :type => scsi_controller_default_type },
+        :scsi_controllers => [{ :type => scsi_controller_default_type }],
         :datacenter => datacenter,
         :boot_order => ['network', 'disk']
       )

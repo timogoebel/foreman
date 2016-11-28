@@ -1,0 +1,7 @@
+<%= select_f f,
+  :type,
+  compute_resource.scsi_controller_types,
+  :first, :last, {},
+  { :label => _("Controller type"),
+    :class => "col-md-2", :disabled => !new_host } %>
+Key: <%= f.object.present? ? f.object.key : 'no object' %>
