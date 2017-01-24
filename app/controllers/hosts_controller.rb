@@ -94,6 +94,7 @@ class HostsController < ApplicationController
   end
 
   def create
+    normalize_scsi_attributes(host_params) if host_params["compute_attributes"] && host_params["compute_attributes"]["scsi_controllers"]
     @host = Host.new(host_params)
     @host.managed = true if (params[:host] && params[:host][:managed].nil?)
     forward_url_options
@@ -922,7 +923,22 @@ class HostsController < ApplicationController
     end.except(:host_parameters_attributes)
   end
 
+<<<<<<< 878f746e9987db48c51665c5f42910cfe78eb5c1
   def csv_columns
     [:name, :operatingsystem, :environment, :model, :hostgroup, :last_report]
+=======
+  def normalize_scsi_attributes(host_params)
+    scsi_and_vol = JSON.parse(host_params["compute_attributes"]["scsi_controllers"]).
+      deep_transform_keys { |key| key.to_s.underscore }.
+      deep_symbolize_keys
+    volumes = {}
+    scsi_and_vol[:volumes].each_with_index do |vol, index|
+      volumes["#{index}"] = vol
+    end
+
+    host_params["compute_attributes"]["scsi_controllers"] = scsi_and_vol[:scsi_controllers]
+    host_params["compute_attributes"]["volumes_attributes"] = volumes
+    host_params
+>>>>>>> Fixes #18345 - Improve templates error handling
   end
 end
