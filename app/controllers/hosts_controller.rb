@@ -934,17 +934,13 @@ class HostsController < ApplicationController
     end.except(:host_parameters_attributes)
   end
 
-  def csv_columns
-    [:name, :operatingsystem, :environment, :model, :hostgroup, :last_report]
-  end
-
   def normalize_scsi_attributes(host_params)
     scsi_and_vol = JSON.parse(host_params["compute_attributes"]["scsi_controllers"]).
       deep_transform_keys { |key| key.to_s.underscore }.
       deep_symbolize_keys
     volumes = {}
     scsi_and_vol[:volumes].each_with_index do |vol, index|
-      volumes["#{index}"] = vol
+      volumes[index.to_s] = vol
     end
 
     host_params["compute_attributes"]["scsi_controllers"] = scsi_and_vol[:scsi_controllers]

@@ -3,12 +3,8 @@ import {Button} from 'react-bootstrap';
 import Controller from './controller/';
 import {connect} from 'react-redux';
 import * as VmWareActions from '../../../../redux/actions/hosts/storage/vmware';
-import {
-  MaxDisksPerController,
-  ControllerTypes,
-  MaxControllers,
-  InitialSCSIKey
-} from './StorageContainer.consts';
+import { MaxDisksPerController, getDiskModeTypes, MaxControllers } from './StorageContainer.consts';
+import { controllersToJsonString } from './StorageContainer.utils';
 import './StorageContainer.scss';
 
 class StorageContainer extends React.Component {
@@ -21,7 +17,7 @@ class StorageContainer extends React.Component {
     initController(data);
   }
 
-  controllers() {
+  controllers(controllerTypes) {
     const {addDisk, updateController, removeDisk, updateDisk, removeController} = this.props;
 
     return this
@@ -29,48 +25,19 @@ class StorageContainer extends React.Component {
       .controllers
       .map((controller, idx) => (<Controller
         key={idx}
-        removeController={ removeController.bind(this, idx) }
+        removeController={removeController.bind(this, idx)}
         controller={controller}
         addDiskEnabled={controller.disks.length < MaxDisksPerController}
         addDisk={addDisk.bind(this, idx)}
         updateDisk={updateDisk.bind(this, idx)}
         removeDisk={removeDisk.bind(this, idx)}
         updateController={updateController.bind(this, idx)}
-        ControllerTypes={ControllerTypes}/>));
-  }
-
-  format() {
-    const data = this
-      .props
-      .controllers
-      .reduce((curr, controller, idx) => Object.assign({}, curr, {
-        scsiControllers: curr
-          .scsiControllers
-          .concat({
-            key: InitialSCSIKey + idx,
-            type: controller.type
-          }),
-        volumes: curr
-          .volumes
-          .concat(controller.disks.map(disk => ({
-            sizeGb: disk.size,
-            storagePod: disk.storagePod,
-            thin: disk.thinProvision,
-            datastore: disk.dataStore,
-            eagerZero: disk.eagerZero,
-            controllerKey: InitialSCSIKey + idx,
-            name: disk.name
-          })))
-      }), {
-        scsiControllers: [],
-        volumes: []
-      });
-
-    return JSON.stringify(data);
+        controllerTypes={controllerTypes}
+        diskModeTypes={getDiskModeTypes()}/>));
   }
 
   render() {
-    const {addController, data, controllers} = this.props;
+    const {addController, data, controllers, controllerTypes} = this.props;
     const disableAddControllerBtn = controllers.length === MaxControllers;
 
     return (
@@ -90,9 +57,9 @@ class StorageContainer extends React.Component {
           </div>
         </div>
         <div className="storage-body">
-          {this.controllers()}
+          {this.controllers(controllerTypes)}
           <input
-            value={this.format()}
+            value={controllersToJsonString(controllers)}
             id="scsi_controller_hidden"
             name="host[compute_attributes][scsi_controllers]"
             type="hidden"/>
@@ -103,7 +70,9 @@ class StorageContainer extends React.Component {
 }
 
 const mapDispatchToProps = state => {
-  return {controllers: state.hosts.storage.vmware.controllers};
+  const {controllers, controllerTypes} = state.hosts.storage.vmware;
+
+  return {controllers, controllerTypes};
 };
 
 export default connect(mapDispatchToProps, VmWareActions)(StorageContainer);

@@ -1,4 +1,8 @@
 export const vmwareData = {
+  'controller_types': `{"VirtualBusLogicController":"Bus Logic Parallel",
+                        "VirtualLsiLogicController":"LSI Logic Parallel",
+                       "VirtualLsiLogicSASController":"LSI Logic SAS",
+                       "ParaVirtualSCSIController":"VMware Paravirtual"}`,
   'storage_pods': [
     {
       StorageCluster: 'StorageCluster (free: 1.15 TB, prov: 7.35 TB, total: 8.5 TB)'
@@ -21,7 +25,7 @@ export const vmwareData = {
 };
 
 export const hiddenFieldValue = {
-  scsiControllers: [{ key: 1000, type: 'ParaVirtualSCSIController' }],
+  scsiControllers: [{key: 1000, type: 'ParaVirtualSCSIController'}],
   volumes: [
     {
       controllerKey: 1000,
@@ -30,7 +34,8 @@ export const hiddenFieldValue = {
       name: 'Hard disk',
       sizeGb: '10',
       storagePod: '',
-      thin: false
+      thin: false,
+      mode: ''
     }
   ]
 };

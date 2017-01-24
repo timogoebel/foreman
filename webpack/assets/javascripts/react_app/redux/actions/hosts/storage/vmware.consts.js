@@ -8,7 +8,8 @@ const _defaultDiskAttributes = () => ({
   storagePod: '',
   thinProvision: false,
   eagerZero: false,
-  name: __('Hard disk')
+  name: __('Hard disk'),
+  mode: ''
 });
 
 export const getDefaultDiskAttributes = _defaultDiskAttributes;

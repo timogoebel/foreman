@@ -35,7 +35,7 @@ export const props = {
     type: 'ParaVirtualSCSIController'
   },
   addDiskEnabled: true,
-  ControllerTypes: {
+  controllerTypes: {
     VirtualBusLogicController: 'Bus Logic Parallel',
     VirtualLsiLogicController: 'LSI Logic Parallel',
     VirtualLsiLogicSASController: 'LSI Logic SAS',

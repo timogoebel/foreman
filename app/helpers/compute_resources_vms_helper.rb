@@ -218,6 +218,8 @@ module ComputeResourcesVmsHelper
     scsi_controllers = {}
     compute.scsi_controller_types.each { |type| scsi_controllers[type[:key]] = type[:title] }
     scsi_controllers
+  end
+
   def new_vm?(host)
     return true unless host.present?
     return true unless host.compute_object.present?

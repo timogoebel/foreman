@@ -4,20 +4,17 @@ import React from 'react';
 import {storiesOf, action, linkTo, addDecorator} from '@kadira/storybook';
 require('../assets/javascripts/bundle');
 require('../../app/assets/javascripts/application');
-import ChartBox
-from '../assets/javascripts/react_app/components/charts/ChartBox';
-import ChartModal
-from '../assets/javascripts/react_app/components/charts/ChartModal';
-import chartService
-from '../assets/javascripts/services/statisticsChartService';
+import ChartBox from '../assets/javascripts/react_app/components/charts/ChartBox';
+import ChartModal from '../assets/javascripts/react_app/components/charts/ChartModal';
+import chartService from '../assets/javascripts/services/statisticsChartService';
 import mockData from './data/charts/donutChartMockData';
 import {simpleLoader} from '../assets/javascripts/react_app/components/common/Loader';
-import PowerStatusInner from
-'../assets/javascripts/react_app/components/hosts/powerStatus/powerStatusInner';
+import PowerStatusInner
+from '../assets/javascripts/react_app/components/hosts/powerStatus/powerStatusInner';
 import Store from '../assets/javascripts/react_app/redux';
 import StorageContainer from '../assets/javascripts/react_app/components/hosts/storage/vmware';
 
-addDecorator((story) => (
+addDecorator(story => (
   <div className="ca" style={{
     textAlign: 'center'
   }}>
@@ -78,24 +75,41 @@ storiesOf('Charts', module).add('Loading', () => (<ChartBox
     setTitle={chartService.setTitle}/>);
 });
 
-storiesOf('Power Status', module).add('Loading', () =>
-  (<PowerStatusInner/>)
-).add('ON', () => (
-    <PowerStatusInner state="on" title="on" statusText="On"/>)
-).add('OFF', () => (
-  <PowerStatusInner state="off" title="off" statusText="Off"/>)
-).add('N/A', () => (
-  <PowerStatusInner state="na" statusText="No power support" title="N/A"/>)
-).add('Error', () => (
-  <PowerStatusInner
-    state="na"
-    statusText="Exception error some where"
-    error="someError"
-    title="N/A"/>)
-);
+storiesOf('Power Status', module).add(
+  'Loading',
+  () => <PowerStatusInner/>
+).add(
+  'ON',
+  () => <PowerStatusInner state="on" title="on" statusText="On"/>
+).add(
+  'OFF',
+  () => <PowerStatusInner state="off" title="off" statusText="Off"/>
+).add(
+  'N/A',
+  () => <PowerStatusInner state="na"
+                          statusText="No power support"
+                          title="N/A"/>
+).add(
+  'Error',
+  () => (<PowerStatusInner
+  state="na"
+  statusText="Exception error some where"
+  error="someError"
+  title="N/A"/>));
 
 // External data from vmware machine...
 const vmwareData = {
+  'controller_types': [
+    {
+      VirtualBusLogicController: 'Bus Logic Parallel'
+    }, {
+      VirtualLsiLogicController: 'LSI Logic Parallel'
+    }, {
+      VirtualLsiLogicSASController: 'LSI Logic SAS'
+    }, {
+      ParaVirtualSCSIController: 'VMware Paravirtual'
+    }
+  ],
   'storage_pods': [
     {
       StorageCluster: 'StorageCluster (free: 1.15 TB, prov: 7.35 TB, total: 8.5 TB)'
@@ -117,6 +131,5 @@ const vmwareData = {
 };
 
 storiesOf('VM Storage', module).add('multiple controllers', () => {
-
   return <StorageContainer store={Store} data={vmwareData}/>;
 });
