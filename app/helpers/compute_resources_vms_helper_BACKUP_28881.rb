@@ -121,6 +121,7 @@ module ComputeResourcesVmsHelper
       actions << vm_power_action(vm, authorizer)
     end
 
+    actions << vm_import_action(vm)
     actions << vm_delete_action(vm, authorizer)
   end
 
@@ -171,13 +172,9 @@ module ComputeResourcesVmsHelper
     controller_name != 'hosts' && controller_name != 'compute_attributes'
   end
 
-  def new_host?(host)
-    host.try(:new_record?)
-  end
-
-  def vsphere_resource_pools(form, compute_resource, new_host = false)
+  def vsphere_resource_pools(form, compute_resource, disabled = false)
     resource_pools = compute_resource.available_resource_pools(:cluster_id => form.object.cluster) rescue []
-    selectable_f form, :resource_pool, resource_pools, { }, :class => "col-md-2", :label => _('Resource pool'), :disabled => !new_host
+    selectable_f form, :resource_pool, resource_pools, { }, :class => "col-md-2", :label => _('Resource pool'), :disabled => disabled
   end
 
   def vms_table
@@ -206,6 +203,7 @@ module ComputeResourcesVmsHelper
         number_to_human_size(vm.memory),
         "<span #{vm_power_class(vm.ready?)}>#{vm_state(vm)}</span>",
         action_buttons(vm_power_action(vm, authorizer),
+                       vm_import_action(vm),
                        display_delete_if_authorized(hash_for_compute_resource_vm_path(:compute_resource_id => @compute_resource, :id => vm.id).merge(:auth_object => @compute_resource, :authorizer => authorizer)))
       ]
     end
@@ -216,9 +214,21 @@ module ComputeResourcesVmsHelper
     display_delete_if_authorized(hash_for_compute_resource_vm_path(:compute_resource_id => @compute_resource, :id => vm.identity).merge(:auth_object => @compute_resource, :authorizer => authorizer), :class => 'btn btn-danger')
   end
 
+<<<<<<< a29d54389e9c00e55c7824e53fb407c9e3e206cd
+  def new_vm?(host)
+    return true unless host.present?
+    return true unless host.compute_object.present?
+    !host.compute_object.persisted?
+  end
+
+  def vm_import_action(vm)
+    return unless Host.for_vm(@compute_resource, vm).empty?
+    display_link_if_authorized(_("Import"), hash_for_import_compute_resource_vm_path(:compute_resource_id => @compute_resource, :id => vm.identity))
+=======
   def vsphere_scsi_controllers(compute)
     scsi_controllers = {}
     compute.scsi_controller_types.each { |type| scsi_controllers[type[:key]] = type[:title] }
     scsi_controllers
+>>>>>>> Fixes #18345 - Improve templates error handling
   end
 end

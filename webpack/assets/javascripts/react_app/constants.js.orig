@@ -1,3 +1,5 @@
+<<<<<<< a29d54389e9c00e55c7824e53fb407c9e3e206cd
+=======
 export const ACTIONS = {
   RECEIVED_HOSTS_POWER_STATE: 'RECEIVED_HOSTS_POWER_STATE',
   HOSTS_REQUEST_ERROR: 'HOSTS_REQUEST_ERROR',
@@ -15,6 +17,7 @@ export const ACTIONS = {
   DISK_UPDATED: 'DISK_UPDATED'
 };
 
+>>>>>>> Fixes #18345 - Improve templates error handling
 export const STATUS = {
   PENDING: 'PENDING',
   RESOLVED: 'RESOLVED',

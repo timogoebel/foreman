@@ -4,10 +4,12 @@ import React from 'react';
 import { storiesOf, action, linkTo, addDecorator } from '@kadira/storybook';
 require('../assets/javascripts/bundle');
 require('../../app/assets/javascripts/application');
-import ChartBox from
-  '../assets/javascripts/react_app/components/charts/ChartBox';
-import ChartModal from '../assets/javascripts/react_app/components/charts/ChartModal';
-import chartService from '../assets/javascripts/services/statisticsChartService';
+import ChartBox
+  from '../assets/javascripts/react_app/components/charts/ChartBox';
+import ChartModal
+  from '../assets/javascripts/react_app/components/charts/ChartModal';
+import chartService
+  from '../assets/javascripts/services/statisticsChartService';
 import mockData from './data/charts/donutChartMockData';
 import { simpleLoader } from '../assets/javascripts/react_app/components/common/Loader';
 import PowerStatusInner from
@@ -16,7 +18,7 @@ import Store from '../assets/javascripts/react_app/redux';
 addDecorator((story) => (
   <div className="ca" style={{ textAlign: 'center' }}>
     {story()}
-    <div id="targetChart"></div>
+    <div id="targetChart" />
   </div>
 ));
 
@@ -26,14 +28,16 @@ storiesOf('Charts', module)
       config={{ data: { columns: [] } }}
       noDataMsg={'No data here'}
       title="Title"
-      status="PENDING"/>
+      status="PENDING"
+    />
   ))
   .add('Without Data', () => (
     <ChartBox
       config={{ data: { columns: [] } }}
       noDataMsg={'No data here'}
       title="Title"
-      status="RESOLVED"/>
+      status="RESOLVED"
+    />
   ))
   .add('With Error', () => (
     <ChartBox
@@ -41,7 +45,8 @@ storiesOf('Charts', module)
       title="Title"
       noDataMsg={'No data here'}
       errorText="Ooops"
-      status="ERROR"/>
+      status="ERROR"
+    />
   ))
   .add('Donut Chart', () => (
     <ChartBox
