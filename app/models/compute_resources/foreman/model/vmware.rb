@@ -101,7 +101,9 @@ module Foreman::Model
     end
 
     def networks(opts = {})
-      name_sort(dc.networks.all(:accessible => true))
+      cache.cache(:networks) do
+        name_sort(dc.networks.all(:accessible => true))
+      end
     end
 
     def resource_pools(opts = {})
@@ -538,6 +540,10 @@ module Foreman::Model
     def firmware_mapping(firmware_type)
       return 'efi' if firmware_type == :uefi
       'bios'
+    end
+
+    def cache
+      @cache || ComputeResourceCache.new(self)
     end
   end
 end
