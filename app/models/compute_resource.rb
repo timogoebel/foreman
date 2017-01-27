@@ -111,14 +111,6 @@ class ComputeResource < ActiveRecord::Base
 
   def save_vm(uuid, attr)
     vm = find_vm_by_uuid(uuid)
-    #volumes are no part of vm.attributes so we have to check and set them seperately if needed
-    if vm.respond_to?(:volumes) && attr.has_key?(:volumes_attributes)
-      vm.volumes.each do |volume|
-        attr[:volumes_attributes].each do |new_vol|
-          volume.size_gb = attr[:volumes_attributes][new_vol[0]][:size_gb] if new_vol[1][:id] == volume.id
-        end
-      end
-    end
     vm.attributes.merge!(attr.deep_symbolize_keys)
     vm.save
   end
