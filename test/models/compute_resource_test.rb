@@ -351,4 +351,20 @@ class ComputeResourceTest < ActiveSupport::TestCase
       assert_equal '1', nic_attributes.first[:id]
     end
   end
+
+  context '#update_required?' do
+    let(:compute_resource) { compute_resources(:mycompute) }
+
+    test 'should not require an update if hashes are equal' do
+      old_attrs = {:a => 'b', 'c' => {:a => '1', :d => 3}}
+      new_attrs = {:a => 'b', :c => {'a' => 1}}
+      assert_equal false, compute_resource.update_required?(old_attrs, new_attrs)
+    end
+
+    test 'should require an update if hashes are different' do
+      old_attrs = {:a => 'b', 'c' => {:a => '1', :d => 3}}
+      new_attrs = {:a => 'b', :c => {'a' => 2}}
+      assert_equal true, compute_resource.update_required?(old_attrs, new_attrs)
+    end
+  end
 end
