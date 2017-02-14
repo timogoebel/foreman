@@ -127,11 +127,16 @@ module ApplicationHelper
   end
 
   def display_delete_if_authorized(options = {}, html_options = {})
+    return "" unless authorized_for(options)
+    display_delete(options, html_options)
+  end
+
+  def display_delete(options = {}, html_options = {})
     text = options.delete(:text) || _("Delete")
     method = options.delete(:method) || :delete
     options = {:auth_action => :destroy}.merge(options)
     html_options = { :data => { :confirm => _('Are you sure?') }, :method => method, :class => 'delete' }.merge(html_options)
-    display_link_if_authorized(text, options, html_options)
+    link_to(text, options, html_options)
   end
 
   # Display a link if user is authorized, otherwise nothing

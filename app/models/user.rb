@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
   include Taxonomix
   include DirtyAssociations
   include UserTime
+  include UserUsergroupCommon
   audited :except => [:last_login_on, :password, :password_hash, :password_salt, :password_confirmation]
 
   ANONYMOUS_ADMIN = 'foreman_admin'
@@ -38,6 +39,7 @@ class User < ActiveRecord::Base
   has_many :permissions,       :through => :filters
   has_many :cached_usergroup_members
   has_many :widgets, :dependent => :destroy
+  has_many :ssh_keys, :dependent => :destroy
 
   has_many :user_mail_notifications, :dependent => :destroy
   has_many :mail_notifications, :through => :user_mail_notifications
@@ -114,6 +116,10 @@ class User < ActiveRecord::Base
   }
 
   dirty_has_many_associations :roles
+
+  class Jail < ::Safemode::Jail
+    allow :login
+  end
 
   def can?(permission, subject = nil)
     if self.admin?
@@ -351,7 +357,13 @@ class User < ActiveRecord::Base
       options[:id].to_i == self.id ||
     options[:controller].to_s =~ /\Aapi\/v\d+\/users\Z/ &&
       options[:action] =~ /show|update/ &&
-      (options[:id].to_i == self.id || options[:id] == self.login)
+      (options[:id].to_i == self.id || options[:id] == self.login) ||
+    options[:controller].to_s == 'ssh_keys' &&
+      options[:user_id].to_i == self.id &&
+      options[:action] =~ /new|create|destroy/ ||
+    options[:controller].to_s == 'api/v2/ssh_keys' &&
+      options[:action] =~ /show|destroy|index|create/ &&
+      options[:user_id].to_i == self.id
   end
 
   def taxonomy_foreign_conditions
