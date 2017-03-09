@@ -2,7 +2,7 @@ import React from 'react';
 import StatisticsChartsList from '../components/charts/StatisticsChartsList';
 import PowerStatus from '../components/hosts/powerStatus/';
 import NotificationContainer from '../components/notifications/';
-import StorageContainer from '../components/hosts/storage/vmware/StorageContainer';
+import StorageContainer from '../components/hosts/storage/vmware/';
 import ReactDOM from 'react-dom';
 import store from '../redux';
 export function mount(component, selector, data) {
@@ -22,7 +22,7 @@ export function mount(component, selector, data) {
     },
     StorageContainer: {
       type: StorageContainer,
-      markup: <StorageContainer data={data} />
+      markup: <StorageContainer store={store} data={data} />
     }
   };
 

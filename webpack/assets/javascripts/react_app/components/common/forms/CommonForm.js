@@ -1,15 +1,17 @@
 import React from 'react';
 
-const CommonForm = (props) => {
+const CommonForm = ({
+  className = '',
+  label = '',
+  children
+}) => {
   return (
-    <div className="clearfix">
-      <div className="form-group">
-        <label className="col-md-2">{props.label}</label>
+      <div className={ `form-group ${className}` }>
+        <label className="col-md-2 control-label">{label}</label>
         <div className="col-md-4">
-          {props.children}
+          {children}
         </div>
       </div>
-    </div>
   );
 };
 

@@ -1,12 +1,18 @@
 import React from 'react';
 import CommonForm from './CommonForm';
-
-const Checkbox = (props) => {
+const Checkbox = ({
+  className = '',
+  checked,
+  onChange,
+  label
+}) => {
   return (
-    <CommonForm label={props.label}>
-      <input type="checkbox"
-             checked={props.checked}
-             onChange={props.onChange} />
+    <CommonForm label={label}
+    className={`common-checkbox ${className}`}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}/>
     </CommonForm>
   );
 };

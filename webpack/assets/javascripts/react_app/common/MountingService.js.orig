@@ -1,13 +1,14 @@
 import React from 'react';
 import StatisticsChartsList from '../components/charts/StatisticsChartsList';
 import PowerStatus from '../components/hosts/powerStatus/';
-<<<<<<< a29d54389e9c00e55c7824e53fb407c9e3e206cd
+<<<<<<< 8b244d9fd24b29ac1ba7bba89e1f72556daae9c1
 import NotificationContainer from '../components/notifications/';
+import StorageContainer from '../components/hosts/storage/vmware/StorageContainer';
 =======
 import NotificationDrawerToggle from '../components/notifications/NotificationDrawerToggle';
 import NotificationDrawer from '../components/notifications/NotificationDrawer';
-import StorageContainer from '../components/hosts/storage/vmware/StorageContainer';
->>>>>>> Fixes #18345 - Improve templates error handling
+import StorageContainer from '../components/hosts/storage/vmware/';
+>>>>>>> Fixes #4509 - SCSI storage controller
 import ReactDOM from 'react-dom';
 import store from '../redux';
 export function mount(component, selector, data) {
@@ -21,23 +22,13 @@ export function mount(component, selector, data) {
       type: PowerStatus,
       markup: <PowerStatus store={store} data={data}/>
     },
-<<<<<<< a29d54389e9c00e55c7824e53fb407c9e3e206cd
     NotificationContainer: {
       type: NotificationContainer,
       markup: <NotificationContainer store={store} data={data} />
-=======
-    NotificationDrawerToggle: {
-      type: NotificationDrawerToggle,
-      markup: <NotificationDrawerToggle url={data.url}/>
-    },
-    NotificationDrawer: {
-      type: NotificationDrawer,
-      markup: <NotificationDrawer data={data} />
     },
     StorageContainer: {
       type: StorageContainer,
-      markup: <StorageContainer data={data} />
->>>>>>> Fixes #18345 - Improve templates error handling
+      markup: <StorageContainer store={store} data={data} />
     }
   };
 

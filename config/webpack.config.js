@@ -100,7 +100,7 @@ if (production) {
     hot: true
   };
   // Source maps
-  config.devtool = 'eval';
+  config.devtool = 'inline-source-map';
 }
 
 module.exports = config;
