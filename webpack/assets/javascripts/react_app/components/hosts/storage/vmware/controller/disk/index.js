@@ -1,101 +1,80 @@
 import React from 'react';
-import VMStorageActions from '../../../../../../actions/VMStorageActions';
 import { Button } from 'react-bootstrap';
 import Select from '../../../../../common/forms/Select';
 import Checkbox from '../../../../../common/forms/Checkbox';
 import TextInput from '../../../../../common/forms/TextInput';
+import './disk.scss';
 
-class Disk extends React.Component {
-  constructor(props) {
-    super(props);
+const Disk = (
+  {
+    removeDisk,
+    updateDisk,
+    name,
+    storagePod,
+    datastores,
+    storagePods,
+    dataStore,
+    size,
+    thinProvision,
+    eagerZero
   }
+) => {
+  const renderOptions = (arr) => arr.map(attribute => {
+    const key = Object.keys(attribute)[0];
+    const value = Object.values(attribute)[0];
 
-  removeDisk(event) {
-    VMStorageActions.removeDisk(this.props.controllerId, this.props.id);
-  }
+    return <option key={key} value={key}>{value}</option>;
+  });
+  const selectableStores = renderOptions(datastores);
+  const selectablePods = renderOptions(storagePods);
 
-  selectableStores() {
-    return this.props.datastores.map((attribute) => {
-      const key = Object.keys(attribute)[0];
-      const value = Object.values(attribute)[0];
+  return (
+    <div className="disk-container">
+      <TextInput
+        value={name}
+        onChange={updateDisk.bind(this, 'name')}
+        label={__('Disk name')}
+      />
 
-      return (<option key={key} value={key}>{value}</option>);
-    });
-  }
+      <Select
+        label={__('Storage Pod')}
+        value={storagePod}
+        onChange={updateDisk.bind(this, 'storagePod')}
+        options={selectablePods}
+      />
 
-  selectablePods() {
-    return this.props.storagePods.map((attribute) => {
-      const key = Object.keys(attribute)[0];
-      const value = Object.values(attribute)[0];
+      <Select
+        label={__('Data store')}
+        value={dataStore}
+        onChange={updateDisk.bind(this, 'dataStore')}
+        options={selectableStores}
+      />
 
-      return (<option key={key} value={key}>{value}</option>);
-    });
-  }
+      <TextInput
+        value={size}
+        className="text-vmware-size"
+        onChange={updateDisk.bind(this, 'size')}
+        label={__('Size (GB)')}
+      />
 
-  updateDiskAttribute(attribute, event) {
-    const value = event.target.value;
-    let attributes = Object.assign({}, this.props);
+      <Checkbox
+        label={__('Thin provision')}
+        checked={thinProvision}
+        onChange={updateDisk.bind(this, 'thinProvision')}
+      />
 
-    attributes[attribute] = value;
-    VMStorageActions.updateDisk(this.props.controllerId, this.props.id, attributes);
-  }
-
-  updateDiskBooleanAttributes(attribute, event) {
-    let attributes = Object.assign({}, this.props);
-
-    attributes[attribute] = !this.props[attribute];
-    VMStorageActions.updateDisk(this.props.controllerId, this.props.id, attributes);
-  }
-
-  render() {
-    return (
-      <div>
-        <TextInput
-          value={this.props.name}
-          onChange={this.updateDiskAttribute.bind(this, 'name')}
-          label={__('Disk name')}
-        />
-
-        <Select
-          label={__('Storage Pod')}
-          value={this.props.storagePod}
-          onChange={this.updateDiskAttribute.bind(this, 'storagePod')}
-          options={this.selectablePods()}
-          />
-
-        <Select
-          label={__('Data store')}
-          value={this.props.dataStore}
-          onChange={this.updateDiskAttribute.bind(this, 'dataStore')}
-          options={this.selectableStores()}
-        />
-
-        <TextInput
-          value={this.props.size}
-          onChange={this.updateDiskAttribute.bind(this, 'size')}
-          label={__('Size (GB)')}
-        />
-
-        <Checkbox
-          label={__('Thin provision')}
-          checked={this.props.thinProvision}
-          onChange={this.updateDiskBooleanAttributes.bind(this, 'thinProvision')}
-        />
-
-        <Checkbox
-          label={__('Eager zero')}
-          checked={this.props.eagerZero}
-          onChange={this.updateDiskBooleanAttributes.bind(this, 'eagerZero')}
-        />
-
-        <Button
-          onClick={this.removeDisk.bind(this)}
-          bsStyle="warning">
-          {__('Remove volume')}
-        </Button>
+      <Checkbox
+        label={__('Eager zero')}
+        checked={eagerZero}
+        onChange={updateDisk.bind(this, 'eagerZero')}
+      />
+      <div className="delete-volume-container form-group">
+      <Button onClick={removeDisk} >
+        {__('Delete volume')}
+      </Button>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default Disk;
