@@ -44,5 +44,6 @@ end %>
 
 <div id="scsi_controllers"></div>
 
-<%= mount_react_component('StorageContainer', '#scsi_controllers', { storage_pods: vsphere_storage_pods(compute_resource),
+<%= mount_react_component('StorageContainer', '#scsi_controllers', { controller_types: compute_resource.scsi_controller_types.to_json,
+                                                                     storage_pods: vsphere_storage_pods(compute_resource),
                                                                      datastores: vsphere_datastores(compute_resource) }.to_json) %>
