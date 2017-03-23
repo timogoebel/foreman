@@ -375,6 +375,8 @@ module Foreman::Model
       add_cdrom = args.delete(:add_cdrom)
       args[:cdroms] = [new_cdrom] if add_cdrom == '1'
 
+      args[:boot_order] = [] if args.delete(:manage_boot_order) == '0'
+
       args.except!(:hardware_version) if args[:hardware_version] == 'Default'
 
       firmware_type = args.delete(:firmware_type)
@@ -421,6 +423,7 @@ module Foreman::Model
     def new_vm(args = {})
       args = parse_args args
       opts = vm_instance_defaults.symbolize_keys.merge(args.symbolize_keys).deep_symbolize_keys
+      opts.delete(:boot_order) if opts[:boot_oder].blank?
       client.servers.new opts
     end
 

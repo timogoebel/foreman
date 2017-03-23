@@ -15,7 +15,7 @@ end %>
                     :label => _('Cluster'), :onchange => 'vsphereGetResourcePools(this)',
                     :help_inline => :indicator,
                     :data => {:url => resource_pools_compute_resource_path(compute_resource)} %>
-<%= vsphere_resource_pools(f, compute_resource, !new_vm) %>
+<%= vsphere_resource_pools(f, compute_resource, new_vm) %>
 <%= select_f f, :path, compute_resource.folders, :path, :to_label , {}, { :label => _("Folder"), :class => "col-md-2", :disabled => !new_vm } %>
 <%= select_f f, :guest_id, compute_resource.guest_types, :first, :last, {}, { :label => _("Guest OS"), :class => "col-md-2", :disabled => !new_vm } %>
 <%= select_f f, :scsi_controller_type, compute_resource.scsi_controller_types, :first, :last, {}, { :label => _("SCSI controller"), :class => "col-md-2", :disabled => !new_vm } %>
@@ -23,7 +23,8 @@ end %>
 <%= checkbox_f f, :memoryHotAddEnabled, { :help_inline => _("Memory hot add lets you add memory resources for a virtual machine while the machine is powered on."), :label => _('Memory hot add'), :label_size => "col-md-2", :disabled => !new_vm } %>
 <%= checkbox_f f, :cpuHotAddEnabled, { :help_inline => _("CPU hot add lets you add CPU resources for a virtual machine while the machine is powered on."), :label => _('CPU hot add'), :label_size => "col-md-2", :disabled => !new_vm } %>
 <%= checkbox_f f, :add_cdrom, { :help_inline => _("Add a CD-ROM drive to the virtual machine."), :label => _('CD-ROM drive'), :label_size => "col-md-2" } if new_vm %>
-<%= checkbox_f f, :boot_order, { :help_inline => _("Use default Foreman behavior to lock boot order on creation"), :label => _('Hardcode boot order'), :label_size => "col-md-2", :disabled => !new_vm } %>
+<% checked = params[:host] && params[:host][:compute_attributes] && params[:host][:compute_attributes][:manage_boot_order] || '1' %>
+<%= checkbox_f f, :manage_boot_order, { :help_inline => _("Use default Foreman behavior to lock boot order on creation"), :label => _('Hardcode boot order'), :label_size => "col-md-2", :disabled => !new_vm, :checked => (checked == '1') } %>
 
 <!--TODO # Move to a helper-->
 <% checked = params[:host] && params[:host][:compute_attributes] && params[:host][:compute_attributes][:start] || '1' %>

@@ -5,7 +5,7 @@ module FogExtensions
 
       attr_accessor :image_id
       attr_accessor :add_cdrom
-      attr_accessor :boot_order
+      attr_accessor :manage_boot_order
 
       def to_s
         name

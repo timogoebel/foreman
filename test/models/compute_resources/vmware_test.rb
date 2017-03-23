@@ -183,6 +183,20 @@ class VmwareTest < ActiveSupport::TestCase
       end
     end
 
+    context 'boot order' do
+      test 'does not modify default boot order' do
+        attrs_in = HashWithIndifferentAccess.new('boot_order' => ['network', 'disk'])
+        attrs_out = {:boot_order => ['network', 'disk']}
+        assert_equal attrs_out, @cr.parse_args(attrs_in)
+      end
+
+      test 'overwrites default boot order if it is not managed' do
+        attrs_in = HashWithIndifferentAccess.new('boot_order' => ['network', 'disk'], 'manage_boot_order' => '0')
+        attrs_out = {:boot_order => []}
+        assert_equal attrs_out, @cr.parse_args(attrs_in)
+      end
+    end
+
     test "doesn't modify input hash" do
       # else compute profiles won't save properly
       attrs_in = HashWithIndifferentAccess.new("interfaces_attributes"=>{"0"=>{"network"=>"network-17"}})
@@ -314,6 +328,29 @@ class VmwareTest < ActiveSupport::TestCase
       attrs = @cr.vm_compute_attributes_for('abc')
 
       assert_equal expected_attrs, attrs
+    end
+  end
+
+  describe "#new_vm" do
+    setup { Fog.mock! }
+    teardown { Fog.unmock! }
+    let(:cr) { compute_resources(:vmware) }
+
+    test 'boot_order can be overwritten' do
+      args = {:boot_order => ['disk']}
+      vm = cr.new_vm(args)
+      assert_equal ['disk'], vm.attributes[:boot_order]
+    end
+
+    test 'vms have default boot_order' do
+      vm = cr.new_vm({})
+      assert_equal ['network', 'disk'], vm.attributes[:boot_order]
+    end
+
+    test 'boot_order is unset when empty array' do
+      args = {:boot_order => []}
+      vm = cr.new_vm(args)
+      refute vm.attributes.key?(:boot_order)
     end
   end
 end
