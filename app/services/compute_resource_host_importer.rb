@@ -16,6 +16,7 @@ class ComputeResourceHostImporter
     copy_vm_attributes
     parse_vm_name
     initialize_interfaces
+    initialize_architecture
   end
 
   private
@@ -57,6 +58,12 @@ class ComputeResourceHostImporter
     attr_name = compute_resource.interfaces_attrs_name
     attr_key = "#{attr_name}_attributes"
     vm_attrs.with_indifferent_access[attr_key].try(:values) || []
+  end
+
+  def initialize_architecture
+    return unless vm.respond_to?(:foreman_architecture)
+    return if vm.foreman_architecture.nil?
+    host.architecture = Architecture.find_by(:name => vm.foreman_architecture)
   end
 
   def vm_name
