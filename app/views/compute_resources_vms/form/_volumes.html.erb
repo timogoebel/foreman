@@ -9,7 +9,7 @@
     <%= field_set_tag _("Storage"), :id => "storage_volumes" do %>
 
       <%= f.fields_for :volumes do |i| %>
-        <%= render :partial => provider_partial(compute_resource, 'volume'), :locals => { :f => i, :compute_resource => compute_resource, :new_host => new_vm, :new_vm => new_vm, :remove_title => _('remove storage volume') }, :layout => "compute_resources_vms/form/#{item_layout}_layout" %>
+      <%= render :partial => provider_partial(compute_resource, 'volume'), :locals => { :f => i, :compute_resource => compute_resource, :new_host => new_vm, :new_vm => new_vm, :remove_title => _('remove storage volume') }, :layout => "compute_resources_vms/form/#{item_layout}_layout" %>
       <% end %>
 
       <% if new_vm %>

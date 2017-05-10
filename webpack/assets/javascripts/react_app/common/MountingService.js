@@ -3,6 +3,7 @@ import StatisticsChartsList from '../components/charts/StatisticsChartsList';
 import PowerStatus from '../components/hosts/powerStatus/';
 import NotificationContainer from '../components/notifications/';
 import ToastsList from '../components/toastNotifications/';
+import StorageContainer from '../components/hosts/storage/vmware/';
 import ReactDOM from 'react-dom';
 import store from '../redux';
 export function mount(component, selector, data) {
@@ -23,7 +24,11 @@ export function mount(component, selector, data) {
     ToastNotifications: {
      type: ToastsList,
      markup: <ToastsList store={store} />
-   }
+   },
+    StorageContainer: {
+      type: StorageContainer,
+      markup: <StorageContainer store={store} data={data} />
+    }
   };
 
   const reactNode = document.querySelector(selector);
