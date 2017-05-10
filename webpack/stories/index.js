@@ -1,7 +1,7 @@
 import React from 'react';
 
 /* eslint-disable no-unused-vars */
-import { storiesOf, action, linkTo, addDecorator } from '@kadira/storybook';
+import {storiesOf, action, linkTo, addDecorator} from '@kadira/storybook';
 require('../assets/javascripts/bundle');
 require('../../app/assets/javascripts/application');
 import ChartBox
@@ -18,6 +18,8 @@ import PowerStatusInner
 import Store from '../assets/javascripts/react_app/redux';
 import Toast
   from '../assets/javascripts/react_app/components/toastNotifications/toastListitem';
+import StorageContainer from '../assets/javascripts/react_app/components/hosts/storage/vmware';
+import { vmwareData2 } from './data/storage/vmware';
 
 addDecorator(story => (
   <div className="ca" style={{ textAlign: 'center' }}>
@@ -134,3 +136,7 @@ storiesOf('Notifications', module)
       dismiss={getDismiss()}
     />
   ));
+
+storiesOf('VM Storage', module).add('multiple controllers', () => {
+  return <StorageContainer store={Store} data={vmwareData2}/>;
+});
