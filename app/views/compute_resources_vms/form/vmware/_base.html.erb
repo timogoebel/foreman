@@ -25,6 +25,7 @@ end %>
 <%= checkbox_f f, :add_cdrom, { :help_inline => _("Add a CD-ROM drive to the virtual machine."), :label => _('CD-ROM drive'), :label_size => "col-md-2" } if new_vm %>
 <% checked = params[:host] && params[:host][:compute_attributes] && params[:host][:compute_attributes][:manage_boot_order] || '1' %>
 <%= checkbox_f f, :manage_boot_order, { :help_inline => _("Use default Foreman behavior to lock boot order on creation"), :label => _('Hardcode boot order'), :label_size => "col-md-2", :disabled => !new_vm, :checked => (checked == '1') } %>
+<%= select_f f, :boot_order, compute_resource.boot_devices, :first, :last, {}, { :label => _("Boot order"), :class => "col-md-2 without_multiselect", :disabled => !new_vm, :multiple => true } %>
 
 <!--TODO # Move to a helper-->
 <% checked = params[:host] && params[:host][:compute_attributes] && params[:host][:compute_attributes][:start] || '1' %>

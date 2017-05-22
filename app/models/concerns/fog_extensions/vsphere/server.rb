@@ -3,9 +3,13 @@ module FogExtensions
     module Server
       extend ActiveSupport::Concern
 
+      included do
+        attribute :boot_order
+      end
+
       attr_accessor :image_id
       attr_accessor :add_cdrom
-      attr_accessor :manage_boot_order
+      #attr_accessor :boot_order
 
       def to_s
         name
