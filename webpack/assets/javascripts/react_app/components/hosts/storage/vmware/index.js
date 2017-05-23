@@ -33,7 +33,7 @@ class StorageContainer extends React.Component {
 
     return controllers.map((controller, idx) => {
       const controllerVolumes = volumes.filter(
-				v => v.controller_key === controller.key
+				v => v.controllerKey === controller.key
 			);
 
       return (

@@ -5,9 +5,8 @@ export const props = {
       thin: true,
       name: 'Hard disk',
       mode: 'persistent',
-      'controller_key': 1000,
-      size: 10485760,
-      'size_gb': 10,
+      'controllerKey': 1000,
+      'sizeGb': 10,
       uuid: 'e86728ee-dbde-ad59-13d6-0c5488635e73'
     }
   ],

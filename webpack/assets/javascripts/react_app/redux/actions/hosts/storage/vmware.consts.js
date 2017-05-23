@@ -5,11 +5,11 @@ export const defaultConrollerAttributes = {
 };
 
 const _defaultDiskAttributes = () => ({
-  size_gb: '10',
-  dataStore: '',
+  sizeGb: '10',
+  datastore: '',
   storagePod: '',
-  thinProvision: false,
-  eager_zero: false,
+  thin: false,
+  eagerZero: false,
   name: __('Hard disk'),
   mode: ''
 });

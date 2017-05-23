@@ -36,9 +36,8 @@ export const vmwareData = {
       thin: true,
       name: 'Hard disk',
       mode: 'persistent',
-      controller_key: 1000,
-      size: 10485760,
-      size_gb: 10
+      controllerKey: 1000,
+      sizeGb: 10
     }
   ],
   controllers: [{type: 'VirtualLsiLogicController', key: 1000}]
@@ -48,11 +47,10 @@ export const hiddenFieldValue = {
   scsiControllers: [{key: 1000, type: 'VirtualLsiLogicController'}],
   volumes: [
     {
-      controller_key: 1000,
+      controllerKey: 1000,
       mode: 'persistent',
       name: 'Hard disk',
-      size: 10485760,
-      size_gb: 10,
+      sizeGb: 10,
       thin: true
     }
   ]

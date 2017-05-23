@@ -12,9 +12,9 @@ const Disk = ({
   config: { datastores, storagePods, diskModeTypes },
   storagePod,
   dataStore,
-  size_gb,
+  sizeGb,
   thin,
-  eager_zero,
+  eagerZero,
   mode
 }) => {
   return (
@@ -48,22 +48,22 @@ const Disk = ({
         <Select
           label={__('Data store')}
           value={dataStore}
-          onChange={updateDisk.bind(this, 'dataStore')}
+          onChange={updateDisk.bind(this, 'datastore')}
           options={datastores}
         />}
 
       <Select
-        label={__('mode')}
+        label={__('Disk Mode')}
         value={mode}
         onChange={updateDisk.bind(this, 'mode')}
         options={diskModeTypes}
       />
 
       <NumericInput
-        value={size_gb}
+        value={sizeGb}
         format={v => `${v} GB`}
         className="text-vmware-size"
-        onChange={updateDisk.bind(this, 'size_gb')}
+        onChange={updateDisk.bind(this, 'sizeGb')}
         label={__('Size (GB)')}
       />
 
@@ -75,8 +75,8 @@ const Disk = ({
 
       <Checkbox
         label={__('Eager zero')}
-        checked={eager_zero}
-        onChange={updateDisk.bind(this, 'eager_zero')}
+        checked={eagerZero}
+        onChange={updateDisk.bind(this, 'eagerZero')}
       />
     </div>
   );

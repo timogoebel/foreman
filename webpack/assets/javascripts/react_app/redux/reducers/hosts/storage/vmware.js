@@ -24,14 +24,14 @@ export default (state = initialState, {type, payload}) => {
         state.volumes.concat({
           ...payload.data,
           uuid: makeUUid(),
-          'controller_key': payload.controllerKey
+          'controllerKey': payload.controllerKey
         })
       );
     case STORAGE_VMWARE_REMOVE_CONTROLLER:
       return state
         .update('controllers', ctrls => ctrls.filter(ctrl => ctrl.key !== payload.controllerKey))
         .update('volumes', volumes =>
-          volumes.filter(volume => volume.controller_key !== payload.controllerKey));
+          volumes.filter(volume => volume.controllerKey !== payload.controllerKey));
     case STORAGE_VMWARE_UPDATE_CONTROLLER:
       return state.updateIn(['controllers', payload.idx], controller =>
         Object.assign({}, controller, payload.newValues));

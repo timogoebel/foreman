@@ -37,9 +37,9 @@ export const vmwareData = {
       thin: true,
       name: 'Hard disk',
       mode: 'persistent',
-      controller_key: 1000,
+      controllerKey: 1000,
       size: 10485760,
-      size_gb: 10
+      sizeGb: 10
     }
   ],
   controllers: [{ type: 'VirtualLsiLogicController', key: 1000 }]
@@ -71,8 +71,8 @@ export const vmwareData2 = {
   controllers: [
     {
       type: 'VirtualLsiLogicController',
-      shared_bus: 'noSharing',
-      unit_number: 7,
+      sharedBus: 'noSharing',
+      unitNumber: 7,
       key: 1000
     }
   ],
@@ -81,14 +81,14 @@ export const vmwareData2 = {
       thin: true,
       name: 'Hard disk 1',
       mode: 'persistent',
-      controller_key: 1000,
-      server_id: '502e324d-a2af-108b-1e10-b6d9eddfc53a',
+      controllerKey: 1000,
+      serverId: '502e324d-a2af-108b-1e10-b6d9eddfc53a',
       datastore: 'Local-Ironforge',
       id: '6000C297-9a11-998a-fc7c-8125ce9042a3',
       filename: '[Local-Ironforge] wanda-marcial.www.somedomain.com/wanda-marcial.www.somedomain.com.vmdk',
       size: 20971520,
       key: 2000,
-      unit_number: 0
+      unitNumber: 0
     }
   ]
 };
