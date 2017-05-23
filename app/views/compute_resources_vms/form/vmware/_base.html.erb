@@ -46,6 +46,7 @@ end %>
 
 <%= mount_react_component('StorageContainer', '#scsi_controllers', {
   config: {
+    vmExists: !new_vm,
     controllerTypes: compute_resource.scsi_controller_types,
     diskModeTypes: compute_resource.disk_mode_types,
     storagePods: vsphere_storage_pods(compute_resource),
