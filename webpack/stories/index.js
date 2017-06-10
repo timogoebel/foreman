@@ -10,10 +10,13 @@ import PieChart from '../assets/javascripts/react_app/components/common/charts/P
 import mockData from './data/charts/donutChartMockData';
 import PowerStatusInner from
  '../assets/javascripts/react_app/components/hosts/powerStatus/powerStatusInner';
-import Store from '../assets/javascripts/react_app/redux';
+import store from '../assets/javascripts/react_app/redux';
 import Toast from '../assets/javascripts/react_app/components/toastNotifications/toastListitem';
 import StorageContainer from '../assets/javascripts/react_app/components/hosts/storage/vmware';
 import * as VMWareData from './data/storage/vmware';
+import { Provider } from 'react-redux'
+import PersonalAccessToken
+  from '../assets/javascripts/react_app/components/personalAccessTokens';
 
 addDecorator(story =>
   <div className="ca" style={{ textAlign: 'center' }}>
@@ -108,3 +111,13 @@ storiesOf('Host VMWare Storage', module)
   .add('without any controllers', () =>
     <StorageContainer store={Store} data={VMWareData.emptyState} />
   );
+
+storiesOf('PersonalAccessTokens', module)
+  .addDecorator((getStory) => (<Provider store={store}>
+    { getStory() }
+    </Provider>
+  ))
+  .add('Form', () => (
+    <PersonalAccessToken
+    />
+  ));
