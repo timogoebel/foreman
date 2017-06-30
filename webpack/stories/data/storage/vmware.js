@@ -30,7 +30,8 @@ export const vmwareData = {
       master_iso_rdu: 'master_iso_rdu (free: 689 GB, prov: 289 GB, total: 973 GB)',
       temp_store: 'temp_store (free: 475 GB, prov: 19.5 MB, total: 475 GB)',
       vsanDatastore: 'vsanDatastore (free: 207 GB, prov: 26.1 GB, total: 233 GB)'
-    }
+    },
+    paramsScope: 'abc'
   },
   volumes: [
     {
@@ -65,7 +66,8 @@ export const vmwareData2 = {
       'Local-Nightwing': 'Local-Nightwing (free: 591 GB, prov: 182 GB, total: 756 GB)',
       'Local-Supermicro': 'Local-Supermicro (free: 599 GB, prov: 317 GB, total: 917 GB)',
       'NFS-Engineering': 'NFS-Engineering (free: 2.3 TB, prov: 1.74 TB, total: 2.64 TB)'
-    }
+    },
+    paramsScope: 'abc'
   },
   controllers: [
     {

@@ -10,6 +10,7 @@ class HostsController < ApplicationController
   include Foreman::Controller::Parameters::Host
   include Foreman::Controller::Puppet::HostsControllerExtensions
   include Foreman::Controller::CsvResponder
+  include Foreman::Controller::NormalizeScsiAttributes
 
   SEARCHABLE_ACTIONS= %w[index active errors out_of_sync pending disabled ]
   AJAX_REQUESTS=%w{compute_resource_selected current_parameters process_hostgroup process_taxonomy review_before_build scheduler_hint_selected}
@@ -97,7 +98,7 @@ class HostsController < ApplicationController
   end
 
   def create
-    normalize_scsi_attributes(host_params) if host_params["compute_attributes"] && host_params["compute_attributes"]["scsi_controllers"]
+    normalize_scsi_attributes(host_params["compute_attributes"]) if host_params["compute_attributes"] && host_params["compute_attributes"]["scsi_controllers"]
     @host = Host.new(host_params)
     @host.managed = true if (params[:host] && params[:host][:managed].nil?)
     forward_url_options
@@ -115,6 +116,7 @@ class HostsController < ApplicationController
   end
 
   def update
+    normalize_scsi_attributes(host_params["compute_attributes"]) if host_params["compute_attributes"] && host_params["compute_attributes"]["scsi_controllers"]
     forward_url_options
     Taxonomy.no_taxonomy_scope do
       attributes = @host.apply_inherited_attributes(host_params)
@@ -937,19 +939,5 @@ class HostsController < ApplicationController
     host_params.select do |k,v|
        host_attributes.include?(k) && !k.end_with?('_ids')
     end.except(:host_parameters_attributes)
-  end
-
-  def normalize_scsi_attributes(host_params)
-    scsi_and_vol = JSON.parse(host_params["compute_attributes"]["scsi_controllers"]).
-      deep_transform_keys { |key| key.to_s.underscore }.
-      deep_symbolize_keys
-    volumes = {}
-    scsi_and_vol[:volumes].each_with_index do |vol, index|
-      volumes[index.to_s] = vol
-    end
-
-    host_params["compute_attributes"]["scsi_controllers"] = scsi_and_vol[:scsi_controllers]
-    host_params["compute_attributes"]["volumes_attributes"] = volumes
-    host_params
   end
 end

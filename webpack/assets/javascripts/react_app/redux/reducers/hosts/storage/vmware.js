@@ -87,6 +87,7 @@ export default (state = initialState, {type, payload}) => {
         .set('config', payload.config)
         .setIn(['config', 'addControllerEnabled'], !!getAvailableKey(payload.controllers))
         .set('controllers', payload.controllers)
+        .set('paramsScope', payload.config.paramsScope)
         .set('volumes', payload.volumes.map(volume => ({...volume, key: uuidV1()})));
     default:
       return state;

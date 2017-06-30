@@ -101,7 +101,7 @@ module ComputeResourcesVmsHelper
   end
 
   def storage_pod_stats(pod)
-     "#{pod.name} (#{_('free')}: #{number_to_human_size(pod.freespace.to_i)}, #{_('prov')}: #{number_to_human_size(pod.capacity.to_i - pod.freespace.to_i)}, #{_('total')}: #{number_to_human_size(pod.capacity.to_i)})"
+    "#{pod.name} (#{_('free')}: #{number_to_human_size(pod.freespace.to_i)}, #{_('prov')}: #{number_to_human_size(pod.capacity.to_i - pod.freespace.to_i)}, #{_('total')}: #{number_to_human_size(pod.capacity.to_i)})"
   end
 
   def available_actions(vm, authorizer = nil)

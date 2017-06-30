@@ -60,6 +60,7 @@ class StorageContainer extends React.Component {
 			volumes,
       config
     } = this.props;
+    const paramsScope = config && config.paramsScope;
     const enableAddControllerBtn = config && config.addControllerEnabled && !config.vmExists;
 		const controllersToJsonString = (controllers, volumes) =>
 			JSON.stringify({
@@ -89,7 +90,7 @@ class StorageContainer extends React.Component {
           <input
             value={controllersToJsonString(controllers, volumes)}
             id="scsi_controller_hidden"
-            name="host[compute_attributes][scsi_controllers]"
+            name={paramsScope}
             type="hidden"
           />
         </div>

@@ -553,6 +553,9 @@ module Foreman::Model
         hsh[index.to_s] = interface_attrs
         hsh
       end
+      vm_attrs[:scsi_controllers] = vm.scsi_controllers.map do |controller|
+        controller.attributes
+      end
       vm_attrs
     end
 
