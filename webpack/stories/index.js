@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { storiesOf, addDecorator } from '@storybook/react';
+import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 
 require('../assets/javascripts/bundle');
@@ -10,20 +10,13 @@ import PieChart from '../assets/javascripts/react_app/components/common/charts/P
 import mockData from './data/charts/donutChartMockData';
 import PowerStatusInner from
  '../assets/javascripts/react_app/components/hosts/powerStatus/powerStatusInner';
-import store from '../assets/javascripts/react_app/redux';
+import Store from '../assets/javascripts/react_app/redux';
 import Toast from '../assets/javascripts/react_app/components/toastNotifications/toastListitem';
 import StorageContainer from '../assets/javascripts/react_app/components/hosts/storage/vmware';
 import * as VMWareData from './data/storage/vmware';
-import { Provider } from 'react-redux'
+import { Provider } from 'react-redux';
 import PersonalAccessToken
-  from '../assets/javascripts/react_app/components/personalAccessTokens';
-
-addDecorator(story =>
-  <div className="ca" style={{ textAlign: 'center' }}>
-    {story()}
-    <div id="targetChart" />
-  </div>
-);
+  from '../assets/javascripts/react_app/components/users/personalAccessTokens';
 
 storiesOf('Charts', module)
   .add('Loading', () =>
@@ -113,7 +106,7 @@ storiesOf('Host VMWare Storage', module)
   );
 
 storiesOf('PersonalAccessTokens', module)
-  .addDecorator((getStory) => (<Provider store={store}>
+  .addDecorator((getStory) => (<Provider store={Store}>
     { getStory() }
     </Provider>
   ))

@@ -54,7 +54,7 @@ gem 'dynflow', '>= 0.8.25', '< 1.0.0'
 gem 'daemons'
 gem 'get_process_mem'
 gem 'bootstrap-datepicker-rails'
-gem 'where-or'
+gem 'where-or' if SETTINGS[:rails] == '4.2'
 
 Dir["#{File.dirname(FOREMAN_GEMFILE)}/bundler.d/*.rb"].each do |bundle|
   self.instance_eval(Bundler.read_file(bundle))

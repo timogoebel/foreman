@@ -3,11 +3,11 @@ import statistics from './statistics';
 import hosts from './hosts';
 import notifications from './notifications/';
 import toasts from './toasts';
-import personalAccessTokens from './personalAccessTokens';
+import users from './users';
 export default combineReducers({
   statistics,
   hosts,
   notifications,
   toasts,
-  personalAccessTokens
+  users
 });
