@@ -15,4 +15,6 @@ group :development do
   gem 'spring', '>= 1.0', '< 3'
   gem 'benchmark-ips'
   gem 'foreman'
+
+  gem 'graphiql-rails'
 end

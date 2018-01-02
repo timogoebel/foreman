@@ -5,4 +5,9 @@ class ApplicationRecord < ActiveRecord::Base
   def logger
     Foreman::Logging.logger('app')
   end
+
+  # TODO: return a global id for graphql-activerecord
+  def gid
+    # add code to return a global object ID here
+  end
 end

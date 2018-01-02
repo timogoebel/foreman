@@ -74,3 +74,12 @@ Style/InverseMethods:
 
 Layout/FirstParameterIndentation:
   EnforcedStyle: consistent
+
+Style/Attr:
+  Exclude:
+    - 'app/graphql/**/*'
+
+Style/Lambda:
+  Exclude:
+    - 'config/initializers/graphql.rb'
+    - 'app/graphql/**/*'
