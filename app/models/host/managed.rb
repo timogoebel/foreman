@@ -165,7 +165,7 @@ class Host::Managed < Host::Base
 
   if SETTINGS[:unattended]
     # handles all orchestration of smart proxies.
-    include UnattendedHelper # which also includes Foreman::Renderer
+    include UnattendedHelper
     include Orchestration
     # DHCP orchestration delegation
     delegate :dhcp?, :dhcp_records, :to => :primary_interface

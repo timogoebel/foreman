@@ -1,5 +1,5 @@
 class TemplatesController < ApplicationController
-  include UnattendedHelper # includes also Foreman::Renderer
+  include UnattendedHelper
   include Foreman::Controller::ProvisioningTemplates
   include Foreman::Controller::AutoCompleteSearch
   include AuditsHelper
@@ -111,8 +111,8 @@ class TemplatesController < ApplicationController
   private
 
   def safe_render(template)
-    load_template_vars
-    render :plain => unattended_render(template)
+    # TODO: Scope
+    render :plain => Foreman::RenderingService.new(subjects: {host: @host}).render(template: template)
   rescue => error
     Foreman::Logging.exception("Error rendering the #{template.name} template", error)
     if error.is_a?(Foreman::Renderer::RenderingError)

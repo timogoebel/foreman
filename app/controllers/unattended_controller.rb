@@ -1,6 +1,4 @@
 class UnattendedController < ApplicationController
-  include Foreman::Renderer
-
   layout false
 
   # We dont require any of these methods for provisioning
@@ -238,22 +236,24 @@ class UnattendedController < ApplicationController
   end
 
   def safe_render(template)
-    if template.is_a?(String)
-      @unsafe_template_content = template
-      @template_name = 'Unnamed'
-    elsif template.is_a?(ProvisioningTemplate)
-      @unsafe_template_content = template.template
-      @template_name = template.name
-    else
-      raise "unknown template"
-    end
+    # TODO: Do we still need this?
+    #if template.is_a?(String)
+    #  @unsafe_template_content = template
+    #  @template_name = 'Unnamed'
+    #elsif template.is_a?(ProvisioningTemplate)
+    #  @unsafe_template_content = template.template
+    #  @template_name = template.name
+    #else
+    #  raise "unknown template"
+    #end
 
-    begin
-      render :inline => "<%= unattended_render(@unsafe_template_content, @template_name).html_safe %>"
-    rescue => error
-      msg = _("There was an error rendering the %s template: ") % (@template_name)
-      Foreman::Logging.exception(msg, error)
-      render :plain => msg + error.message, :status => :internal_server_error
-    end
+    #begin
+    rendered_template = Foreman::RenderingService.new(subjects: {host: @host}).render(template: template)
+    render :plain => rendered_template
+  rescue => error
+    msg = _("There was an error rendering the %s template: ") % (@template_name)
+    Foreman::Logging.exception(msg, error)
+    render :plain => msg + error.message, :status => :internal_server_error
+    #end
   end
 end
