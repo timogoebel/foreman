@@ -7,6 +7,7 @@ import * as VmWareActions from '../../../../redux/actions/hosts/storage/vmware';
 import { MaxDisksPerController } from './StorageContainer.consts';
 import { translate as __ } from '../../../../../react_app/common/I18n';
 import './StorageContainer.scss';
+import { STATUS } from '../../../../constants';
 
 const filterKeyFromVolume = (volume) => {
   // eslint-disable-next-line no-unused-vars
@@ -27,6 +28,17 @@ class StorageContainer extends React.Component {
     initController(config, controllers, volumes);
   }
 
+  getDatastoresStatus() {
+    const { datastoresLoading, datastoresError } = this.props;
+    if (datastoresError) {
+      return STATUS.ERROR;
+    }
+    if (datastoresLoading) {
+      return STATUS.PENDING;
+    }
+    return STATUS.RESOLVED;
+  }
+
   renderControllers(controllers) {
     const {
       addDisk,
@@ -36,6 +48,8 @@ class StorageContainer extends React.Component {
       removeController,
       config,
       volumes,
+      datastores,
+      datastoresError,
     } = this.props;
 
     return controllers.map((controller, idx) => {
@@ -53,6 +67,9 @@ class StorageContainer extends React.Component {
           removeDisk={removeDisk}
           updateController={updateController.bind(this, idx)}
           config={config}
+          datastores={datastores}
+          datastoresError={datastoresError}
+          datastoresStatus={this.getDatastoresStatus()}
         />
       );
     });
@@ -95,9 +112,13 @@ class StorageContainer extends React.Component {
 }
 
 const mapDispatchToProps = (state) => {
-  const { controllers, config, volumes = [] } = state.hosts.storage.vmware;
+  const {
+    controllers, config, volumes = [], datastores, datastoresLoading, datastoresError,
+  } = state.hosts.storage.vmware;
 
-  return { controllers, volumes, config };
+  return {
+    controllers, volumes, config, datastores, datastoresLoading, datastoresError,
+  };
 };
 
 export default connect(mapDispatchToProps, VmWareActions)(StorageContainer);
