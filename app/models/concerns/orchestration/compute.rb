@@ -66,7 +66,10 @@ module Orchestration::Compute
   end
 
   def queue_compute_update
-    return unless compute_update_required?
+    unless compute_update_required?
+      logger.error "No compute update required."
+      return
+    end
     logger.debug("Detected a change is required for compute resource")
     queue.create(:name   => _("Compute resource update for %s") % old, :priority => 7,
                  :action => [self, :setComputeUpdate])
