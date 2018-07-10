@@ -123,6 +123,10 @@ class ActiveRecord::Base
     super
     self.auditing_enabled = false if Foreman.in_setup_db_rake?
   end
+
+  def self.supports_authorize?
+    true
+  end
 end
 
 module ExemptedFromLogging
