@@ -5,13 +5,8 @@ class HostGroupsHelperTest < ActionView::TestCase
   include HostsAndHostgroupsHelper
   include ApplicationHelper
   include HostsHelper
+  include AuthorizeHelper
   include ::FormHelper
-
-  # authorized_for is set as helper_method when
-  # Foreman::Controller::Authorize is included which
-  # causing "SystemStackError: stack level too deep"
-  # to avoid this I am using prepend.
-  prepend Foreman::Controller::Authorize
 
   test "should have the full string of the parent class if the child is a substring" do
     test_group = Hostgroup.create(:name => "test/st")
