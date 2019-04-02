@@ -110,16 +110,35 @@ module Hostext
         key_name = User.connection.quote_column_name(clean_key)
         condition = sanitize_sql_for_conditions(["#{key_name} #{operator} ?", value_to_sql(operator, value)])
 
-        user_ids = User.where(condition).reorder(nil).distinct.pluck(:id)
-        usergroup_ids = Usergroup.joins(:cached_usergroup_members).where(cached_usergroup_members: {user_id: user_ids}).reorder(nil).distinct.pluck(:id)
+        user_ids = User.where(condition).reorder(nil).pluck(:id)
 
-        sql  = ''
-        sql += "(\"hosts\".\"owner_type\" = 'User' AND \"hosts\".\"owner_id\" IN (#{user_ids.join(',')}))"
-        sql += ' OR ' if usergroup_ids.any?
-        sql += "(\"hosts\".\"owner_type\" = 'Usergroup' AND \"hosts\".\"owner_id\" IN (#{usergroup_ids.join(',')}))" if usergroup_ids.any?
-        sql  = 'hosts.id < 0' if user_ids.empty?
+        return { conditions: '1 = 0' } if user_ids.empty?
 
-        {conditions: sql}
+        usergroup_ids = Usergroup.joins(:cached_usergroup_members)
+                                 .where(cached_usergroup_members: {user_id: user_ids})
+                                 .reorder(nil)
+                                 .distinct
+                                 .pluck(:id)
+
+        sql = <<-SQL
+          hosts.owner_id IS NOT NULL
+            AND
+          (
+            (
+              hosts.owner_type = 'User'
+                AND
+              hosts.owner_id IN (?)
+            )
+              OR
+            (
+              hosts.owner_type = 'Usergroup'
+                AND
+              hosts.owner_id IN (?)
+            )
+          )
+        SQL
+
+        { conditions: sanitize_sql_array([sql, user_ids, usergroup_ids]) }
       end
 
       def search_by_puppetclass(key, operator, value)
